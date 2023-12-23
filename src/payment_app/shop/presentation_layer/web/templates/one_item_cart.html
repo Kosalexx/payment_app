@@ -1,55 +1,26 @@
 {% load static %}
-<head>
-    <script src="https://js.stripe.com/v3/"></script>
-</head>
-<div class="col">
-    <div class="card h-100">
-        <div class="border border-light p-2 mb-3" >
-        {% if item.photo %}
-            <img src="{{ item.photo.url }}" class="card-img-top" hight="150px" alt="{{ item.name }}">
-        {% else %}
-            <img src="{% static 'img/no-image.png' %}" class="card-img-top"  hight="150px" alt="No image">
 
-        {% endif %}
-        </div>
-        <div class="card-body">
-            <h5 class="card-title">{{ item.name }}</h5><hr>
-            <div style="float: right;">
-            <a class="link-secondary btn" href="{% url 'item-info' item.pk %}">Detail ></a>
-        </div>
-        <div style="float: left;"><h2 class="card-text pricing-card-title">{% if item.currency.name == 'usd' %}${% else %}€{% endif %}{{ item.price }}</h2></div>
-        <p></p>
-        <br>
-        <hr>
-            <div class="btn-group" role="group" style="float: right;">
-                <form method="post" action="">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-warning" disabled>Add to cart
-                        <i class="bi bi-bag-plus-fill"></i>
-                    </button>
-                </form>
-                <a href="">
-                    <button type="submit" id="buy-button" class="btn btn-primary">Buy now
-                        <i class="bi bi-cart-check"></i>
-                    </button>
-                    <script type="text/javascript">
-                        fetch("{% url 'config' item.currency.name %}")
-                        .then((result) => { return result.json(); })
-                        .then((data) => {
-                            const stripe = Stripe(data.publicKey);
-                            var buyButton = document.getElementById('buy-button')
-                            buyButton.addEventListener("click", () => {
-                                fetch('{% url "stripe-session-buy" item.id %}', {method: 'GET'})
-                                .then((result) => { return result.json(); })
-                                .then((data) => {
-                                    return stripe.redirectToCheckout({sessionId: data.sessionId})
-                            })
-                        });
-                    });
-                    
-                    </script>
-                </a>
+<a class="link-offset-2 link-underline link-underline-opacity-0" href="{% url 'item-info' item.pk %}">
+    <div class="col">
+        <div class="card h-100">
+            <div class="border border-light p-2 mb-3" >
+            {% if item.photo %}
+                <img src="{{ item.photo.url }}" class="card-img-top" hight="150px" alt="{{ item.name }}">
+            {% else %}
+                <img src="{% static 'img/no-image.png' %}" class="card-img-top"  hight="150px" alt="No image">
+
+            {% endif %}
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">{{ item.name }}</h5><hr>
+                <div style="float: right;">
+            </div>
+            <div style="float: left;"><h2 class="card-text pricing-card-title">{% if item.currency.name == 'usd' %}${% else %}€{% endif %}{{ item.price }}</h2></div>
+            <p></p>
+            <br>
+            <br>
+            <hr>
             </div>
         </div>
     </div>
-  </div>
+</a>

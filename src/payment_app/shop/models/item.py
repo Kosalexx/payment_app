@@ -30,7 +30,8 @@ class Item(BaseModel):
         return str(self.name)
 
     def get_absolute_url(self) -> str:
-        result = reverse("shop:concrete_item", args=[self.name])
+        """Gets Item absolute url."""
+        result = reverse("item-info", args=[self.pk])
         return str(result)
 
     class Meta:
