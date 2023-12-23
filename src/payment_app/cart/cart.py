@@ -2,7 +2,6 @@ from decimal import Decimal
 from typing import Generator
 
 from cart.business_logic.services import get_cart_products_list
-from django.conf import settings
 from django.http import HttpRequest
 from shop.models import Item
 
@@ -31,28 +30,49 @@ class Cart:
             item["total"] = item["price"] * item["qty"]
             yield item
 
-    def add(self, product: Item, quantity: str) -> None:
+    def add(self, product: Item, quantity: int) -> None:
+        """Adds a new item to the cart."""
         product_id = str(product.id)
         if product_id not in self.cart:
-            self.cart[product_id] = {"qty": quantity, "price": str(product.price)}
+            self.cart[product_id] = {
+                "qty": quantity,
+                "price": str(product.price),
+                "currency": str(product.currency.name),
+            }
         self.cart[product_id]["qty"] = quantity
         self.session.modified = True
 
-    def delete(self, product: Item) -> None:
+    def delete(self, product: int) -> None:
+        """Deletes item from the cart by passed product id."""
+
         product_id = str(product)
         if product_id in self.cart:
             del self.cart[product_id]
             self.session.modified = True
 
-    def update(self, product: Item, quantity: str) -> None:
+    def update(self, product: int, quantity: int) -> None:
+        """Updates item quantity in the cart by passed product id and new quantity value."""
+
         product_id = str(product)
         if product_id in self.cart:
             self.cart[product_id]["qty"] = quantity
             self.session.modified = True
 
-    def get_total_price(self) -> Decimal:
-        result: Decimal = sum(Decimal(item["price"]) * item["qty"] for item in self.cart.values())
+    def get_total_price(self) -> dict[str, Decimal]:
+        """Gets the cart's total price grouped by currency."""
+
+        total_usd = Decimal(0)
+        total_eur = Decimal(0)
+        for item in self.cart.values():
+            if item["product"].currency.name == "usd":
+                total_usd += Decimal(item["price"]) * int(item["qty"])
+            else:
+                total_eur += Decimal(item["price"]) * int(item["qty"])
+        result = {"usd": total_usd, "eur": total_eur}
         return result
 
     def clear(self) -> None:
-        del self.session[settings.CART_SESSION_ID]
+        """Clears cart."""
+
+        del self.session["session_key"]
+        self.session.modified = True
