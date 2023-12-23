@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block content %}
+{% load static %}
+<div class="card h-100">
+    <div class="border border-light p-2 mb-3">
+        <h2 class="display-8 text-left">{{ item.name }}</h2>
+        <div class="col-lg-12 d-flex align-items-center">
+            <div class="col-lg-3 text-center">
+                <link rel="stylesheet" href="{% static 'css/modal_photo.css' %}">
+                {% if item.photo %}
+                    <img src="{{ item.photo.url }}" alt="{{ item.name }}" id="myImg" width="150px;"  class="rounded-9">
+                {% else %}
+                    <img src="{% static 'img/no-image.png' %}" alt="No image" id="myImg" width="150px;" class="rounded-9">
+                {% endif %}
+                    <div id="myModal" class="modal">
+
+                    <!-- The Close Button -->
+                        <span class="close">&times;</span>
+
+                        <!-- Modal Content (The Image) -->
+                        <img class="modal-content" id="img01">
+                            
+                    <!-- Modal Caption (Image Text) -->
+                    <div id="caption"></div>
+                    </div>
+                    <script src="{% static 'js/modal_photo.js' %}"></script>
+            </div>
+            <div class="col-lg-6">
+                <h1 class="text-hard"><i class="bi bi-cash-coin"></i>  Price: {% if item.currency.name == 'usd' %}${% else %}€{% endif %}{{ item.price }}</h1>
+                
+                <p class="text-muted"><i class="bi bi-info-square"></i>  Name: {{ item.name }}</p>
+                <p class="text-muted"><i class="bi bi-calendar-check"></i>  Created: {{ item.created_at|date:"M d, Y" }}</p>
+                
+                    <div class="col-lg-6">Description:<ul>      {{ item.description }}</ul></div>
+                
+            </div>
+            <div class="col-lg-3">
+                    <button class="w-100 btn btn-primary rounded-pill" id="buy-button">Buy now</button>
+                    <script type="text/javascript">
+                        fetch("{% url 'config' item.currency.name %}")
+                        .then((result) => { return result.json(); })
+                        .then((data) => {
+                            const stripe = Stripe(data.publicKey);
+                            var buyButton = document.getElementById('buy-button')
+                            buyButton.addEventListener("click", () => {
+                                fetch('{% url "stripe-session-buy" item.id %}', {method: 'GET'})
+                                .then((result) => { return result.json(); })
+                                .then((data) => {
+                                    return stripe.redirectToCheckout({sessionId: data.sessionId})
+                            })
+                        });
+                    });
+                    
+                    </script>
+                    <form method="post" action="">
+                        {% csrf_token %}
+                        <button type="submit" class="w-100 btn btn-outline-danger rounded-pill" disabled>Add to cart</button>
+                    </form>
+<!--                 
+                    <form method="post" action="">
+                        {% csrf_token %}
+                        <button type="submit" class="w-100 btn btn-primary rounded-pill">Unfollow</button>
+                    </form>
+                 -->
+                
+            </div>
+            
+        </div>
+        <div class="col-lg-12">
+            
+        </div>
+    </div>
+
+
+
+{% endblock %}
