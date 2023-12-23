@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+{% load static %}
+
+
+
+<div class="row row-cols-1 row-cols-md-3 g-4">
+{% for item in products %}
+
+    {% include "one_item_cart.html" with item=item %}
+
+{% endfor %}
+</div>
+    
+
+
+{% endblock %}
+
+
