@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
@@ -7,12 +9,13 @@ from .base import BaseModel
 class Tax(BaseModel):
     """Describes the fields and attributes of the Tax model in the database."""
 
-    value = models.IntegerField(validators=[MaxValueValidator(99), MinValueValidator(0)], default=0)
+    percentage = models.DecimalField(
+        decimal_places=2, max_digits=9, validators=[MaxValueValidator(Decimal(99)), MinValueValidator(0)], default=0
+    )
     name = models.CharField(max_length=30, unique=True)
-    stripe_id = models.CharField(max_length=100, blank=True)
 
     def __str__(self) -> str:
-        return f"{(self.name)}: {self.value}%"
+        return f"{(self.name)}: {self.percentage}%"
 
     class Meta:
         """Describes class metadata."""

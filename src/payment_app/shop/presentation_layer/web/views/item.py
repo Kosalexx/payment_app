@@ -10,6 +10,7 @@ from shop.business_logic.dto import AddItemDTO
 from shop.business_logic.errors import ItemAlreadyExistsError, ItemNotFoundError
 from shop.business_logic.services import (
     create_product,
+    get_categories_func,
     get_currencies_func,
     get_product_by_id,
 )
@@ -26,12 +27,13 @@ if TYPE_CHECKING:
 def add_item_controller(request: HttpRequest) -> HttpResponse:
     """Add item controller."""
     currencies = get_currencies_func()
+    categories = get_categories_func()
     if request.method == "GET":
-        form = AddItemForm(currencies=currencies)
+        form = AddItemForm(currencies=currencies, categories=categories)
         context = {"form": form}
         return render(request=request, template_name="add_product.html", context=context)
     if request.method == "POST":
-        form = AddItemForm(currencies, request.POST, request.FILES)
+        form = AddItemForm(currencies, categories, request.POST, request.FILES)
         if form.is_valid():
             data = convert_data_from_request_to_dto(dto=AddItemDTO, data_from_request=form.cleaned_data)
             try:
@@ -43,9 +45,11 @@ def add_item_controller(request: HttpRequest) -> HttpResponse:
                     "form": form,
                     "err_message": "The item with the entered name already exists... Please try again.",
                 }
-                return render(request=request, template_name="registration.html", context=context_2)
+                return render(request=request, template_name="add_product.html", context=context_2)
         else:
             logger.info("Invalid form", extra={"post_data": request.POST})
+            context_inv = {"form": form}
+            return render(request=request, template_name="add_product.html", context=context_inv)
     return HttpResponseBadRequest("Incorrect HTTP method.")
 
 

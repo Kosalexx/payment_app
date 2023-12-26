@@ -25,6 +25,7 @@ class Item(BaseModel):
     price = models.DecimalField(
         default=0, max_digits=9, decimal_places=2, validators=[MinValueValidator(Decimal("0.50"))]
     )
+    category = models.ForeignKey(to="Category", default=None, on_delete=models.CASCADE, related_name="items")
 
     def __str__(self) -> str:
         return str(self.name)

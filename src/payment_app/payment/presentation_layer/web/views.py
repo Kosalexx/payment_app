@@ -11,7 +11,7 @@ from payment.business_logic.api import (
     create_checkout_session,
     get_stripe_settings_by_currency_name,
 )
-from shop.business_logic.services import get_product_by_id
+from shop.business_logic.services import get_order_info_by_id
 
 if TYPE_CHECKING:
     from django.http import HttpRequest, HttpResponse
@@ -35,13 +35,13 @@ def get_stripe_config(request: HttpRequest, slug: str) -> JsonResponse:
 
 
 @require_http_methods(request_method_list=["GET"])
-def buy_using_stripe_session_controller(request: HttpRequest, item_id: int) -> JsonResponse:
+def buy_using_stripe_session_controller(request: HttpRequest, order_id: int) -> JsonResponse:
     """Index page controller."""
 
     try:
-        product_info = get_product_by_id(item_id=item_id)
+        order_info = get_order_info_by_id(order_id=order_id)
 
-        checkout_session = create_checkout_session(request=request, data=product_info)
+        checkout_session = create_checkout_session(request=request, data=order_info)
 
         return JsonResponse({"sessionId": checkout_session["id"]})
     except Exception as err:
