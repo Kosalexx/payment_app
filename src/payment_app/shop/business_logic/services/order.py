@@ -81,27 +81,39 @@ def get_order_info_by_id(order_id: int) -> OrderDataDTO:
         "item", "item__currency", "item__category", "item__category__tax", "order", "order__discount"
     ).filter(order=order)
 
-    total_in_order_cur = Decimal(0)
+    total_in_order_cur_no_tax_no_disc = Decimal(0)
+    total_in_order_cur_with_tax_and_disc = Decimal(0)
     for item in order_items:
         counted_price = Decimal(item.item.price) * item.quantity
+        counted_price_with_discount = (
+            counted_price
+            if order.discount is None
+            else (counted_price - (counted_price * order.discount.percent_off / 100))
+        )
+        counted_price_with_taxes = counted_price_with_discount + (
+            (counted_price_with_discount * item.item.category.tax.percentage / 100)
+        )
+        for tax in order.tax.all():
+            counted_price_with_taxes = counted_price_with_taxes + (counted_price_with_discount * tax.percentage / 100)
         total_price_by_currency[item.item.currency.name] = (
             total_price_by_currency.setdefault(item.item.currency.name, Decimal(0)) + counted_price
         )
         if item.item.currency == order.payment_currency:
-            total_in_order_cur += counted_price
+            total_in_order_cur_no_tax_no_disc += counted_price
+            total_in_order_cur_with_tax_and_disc += counted_price_with_taxes
         else:
-            total_in_order_cur += convert_price(
+            total_in_order_cur_no_tax_no_disc += convert_price(
                 from_cur=item.item.currency, to_cur=order.payment_currency, price=counted_price
+            )
+            total_in_order_cur_with_tax_and_disc += convert_price(
+                from_cur=item.item.currency, to_cur=order.payment_currency, price=counted_price_with_taxes
             )
 
     result = OrderDataDTO(
-        total_by_cur=total_price_by_currency.items(),
+        total_by_cur=list(total_price_by_currency.items()),
         order=order,
         order_items=list(order_items),
-        total_in_order_cur=total_in_order_cur.quantize(Decimal("1.00")),
+        total_in_order_cur=total_in_order_cur_no_tax_no_disc.quantize(Decimal("1.00")),
+        final_total=total_in_order_cur_with_tax_and_disc.quantize(Decimal("1.00")),
     )
-    if order.discount:
-        discounted_price = total_in_order_cur - (Decimal(order.discount.percent_off) / 100 * total_in_order_cur)
-        result.total_after_discount = discounted_price.quantize(Decimal("1.00"))
-
     return result

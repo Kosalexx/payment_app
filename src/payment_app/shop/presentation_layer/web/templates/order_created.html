@@ -59,14 +59,47 @@
                     </div>
                 </div><hr>
                 {% endif %}
-                
+                <div class="h6 fw-bold">
+                            
+                    Taxes:
+                    
+                    <div id="total" class="d-inline-flex">
+                        <table class="table table-sm">
+                            <tr>
+                                <th style="color: black;">Product</th>
+                                <th style="color: black;">-</th>
+                                <th style="color: black;">Tax name: value, %</th>
+                                
+                            </tr>
+                            {% for item in info.order_items %}
+                            
+                            <tr>
+                                <td style="color: brown;">{{ item.item }} </td>
+                                <td style="color: brown;">-</td>
+                                <td style="color: brown;">{{ item.item.category.tax }}</td>
+                                
+                            </tr>
+                            <br>
+                            {% endfor %}
+                            {% for tax in info.order.tax.all %}
+                            <tr>
+                                <td style="color: rgb(248, 144, 40);">Addition order tax</td>
+                                <td style="color: rgb(248, 144, 40);">-</td>
+                                <td style="color: rgb(248, 144, 40);">{{ tax }}</td>
+                                
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                    
+                </div><hr>
                 <div class="h6 fw-bold">
                     FINAL TOTAL:
                     <div class="d-inline-flex">
                         <table class="text-end table table-bordered">
                             <tr><th style="color: red;">{% if info.order.payment_currency.name == 'usd' %}${% else %}€{% endif %}</th>
                                 <th style="color: red;"></th>
-                                <th style="color: red;">{% if info.total_after_discount %}{{ info.total_after_discount }}{% else %}{{ info.total_in_order_cur }}{% endif %}</th>
+                                <th style="color: red;">{{ info.final_total }}</th>
                             </tr>
                                 <br>
                         </table>
@@ -75,7 +108,9 @@
                 
             </div>
             <div class="container-fluid text-end">
-            <button class="btn btn-primary btn-md mt-4" id="buy-button">Pay with stripe</button>
+            <button class="btn btn-primary btn-md mt-4" id="buy-button">Pay (with Stripe Checkout Session) </button>
+            <a href="{% url 'payment-intent-form' info.order.id %}" class="btn btn-primary btn-md mt-4" >Pay (with Stripe Payment Intent) </a>
+
         </div>
         </div>
         </div>

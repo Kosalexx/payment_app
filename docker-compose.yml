@@ -18,8 +18,7 @@ services:
       - '8000:8000'
     command: >
       sh -c 'cd ./src/payment_app &&
-      python3 manage.py migrate &&
-      python manage.py createsuperuser --noinput &&
+      python manage.py migrate &&
       ./start_app.sh'
     depends_on:
       - db

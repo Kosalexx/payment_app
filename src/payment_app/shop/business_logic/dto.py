@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from decimal import Decimal
 
-from _collections_abc import dict_items
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from shop.models import Item, Order, OrderItem
 
@@ -32,8 +31,8 @@ class OrderDTO:
 
 @dataclass
 class OrderDataDTO:
-    total_by_cur: dict_items[str, Decimal]
+    total_by_cur: list[tuple[str, Decimal]]
     order: Order
     order_items: list[OrderItem]
     total_in_order_cur: Decimal
-    total_after_discount: Decimal | None = None
+    final_total: Decimal
