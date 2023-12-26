@@ -19,10 +19,11 @@ A simple online store with connected Stripe API payment system.
  - [x]	Использование environment variables
  - [x]	Просмотр Django Моделей в Django Admin панели
  - [ ]	Запуск приложения на удаленном сервере, доступном для тестирования
- - [ ] - В ПРОЦЕССЕ -	Модель Order, в которой можно объединить несколько Item и сделать платёж в Stripe на содержимое Order c общей стоимостью всех Items
- - [ ] - В ПРОЦЕССЕ -	Модели Discount, Tax, которые можно прикрепить к модели Order и связать с соответствующими атрибутами при создании платежа в Stripe - в таком случае они корректно отображаются в Stripe Checkout форме. 
- - [x]	Добавить поле Item.currency, создать 2 Stripe Keypair на две разные валюты и в зависимости от валюты выбранного товара предлагать оплату в соответствующей валюте. --- Создано 2 компании в рамках аккаунта и в зависимости от валюты выбирается оплата на нужный аккаунт
- - [ ]	Реализовать не Stripe Session, а Stripe Payment Intent. # TODO
+ - [x] - Модель Order, в которой можно объединить несколько Item и сделать платёж в Stripe на содержимое Order c общей стоимостью всех Items
+ - [x] - Модели Discount, Tax, которые можно прикрепить к модели Order и связать с соответствующими атрибутами при создании платежа в Stripe - в таком случае они корректно отображаются в Stripe Checkout форме. ---  # для привязки скидки к заказу используются промокоды. Пользователь вводит промокод, если такой есть в БД -> заказ получает скидку. / Налоги прикреплены к категории товара, в зависимости от категории назначается налог, также к каждому заказу при создании добавляется "налог платежной системы" (далее можно придумать другую логику для добавления налогов). 
+ - [x]	Добавить поле Item.currency, создать 2 Stripe Keypair на две разные валюты и в зависимости от валюты выбранного товара предлагать оплату в соответствующей валюте. --- # Создано 2 компании в рамках аккаунта и в зависимости от валюты выбирается оплата на нужный аккаунт. Также при оплате пользователь выбирает в какой валюте платить - исходя из этого добавлена модель Exchange - для конвертации валюты в случаях если в корзину добавлены товары в разных валютах.
+ - [ ]	Реализовать не Stripe Session, а Stripe Payment Intent. 
+ # TODO 1. Stripe webhooks
 
 </details>
 
@@ -81,7 +82,21 @@ If the database is empty - products can be added in the "Add product" tab.
 
 Extended product info is displayed on the product page "/item/{item_id}."
 
-You can buy an item by clicking the "buy" button. Stripe API is used as a payment acceptance system.
+You can buy an item by clicking the "buy now" button. Or you can add an item to your cart and buy all the items in your cart in one order.
+
+After clicking the "buy now" button from the product card (or checkout from the cart), the user is redirected to the order confirmation form.
+
+In the order confirmation form, the user must be sure to add an email. It is also possible to add a promo code (enter a value) and if there is such a promo code in the database - the corresponding discount will be applied to the order.
+
+The default list of discounts is available on the "Available discounts" tab. New discounts can be added from the admin panel.
+
+Taxes are attached to the product category, depending on the category the tax is assigned, also "Sales stripe tax" is added to each order at creation (further we can think of other logic for adding taxes).
+
+Stripe Session API is used as a payment acceptance system.
+
+
+ # TODO 1. PaymentIntent
+ # TODO 2. Stripe webhooks
 
 <h1></h1>
 

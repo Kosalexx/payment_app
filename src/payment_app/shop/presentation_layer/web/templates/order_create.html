@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Place an order</h1>
+    <div class="container">
+        <div class="row justify-content-between">
+            <div class="col col-lg-4">
+                <form action="
+                {% if item %}{% url 'item-order' item.id %}{% else %}{% url 'order-create' %}{% endif %}" method="post" class="order-form">
+                    {{ form.as_p }}
+                    <p><input type="submit" value="Place order"></p>
+                    {% csrf_token %}
+                </form>
+            </div>
+            <div class="col col-lg-3">
+                <div class="border border-light p-2 mb-3 " style="background-color: rgb(193, 141, 245);">
+                    <div class="col border border-light p-2 mb-3" style="background-color: rgb(251, 251, 251);">
+                        <h3>Your order</h3>
+                        <ul>
+                            {% if item %}
+                                <li>
+                                    {{ item.name }}: -
+                                    <span class="h6 fw-bold">
+                                        1 x {{ item.price }}{% if item.currency.name == 'usd' %}${% elif item.currency.name == 'eur' %}€{% endif %}
+                                    </span>
+                                </li>
+                            {% else %}
+                                {% for item in cart %}
+                                    {% with product=item.product %}
+                                        <li>
+                                            {{ product.name }}: - 
+                                            <span class="h6 fw-bold">
+                                                {{item.qty}} x {{ item.price }}{% if product.currency.name == 'usd' %}${% elif product.currency.name == 'eur' %}€{% endif %}
+                                            </span>
+                                        </li>
+                                    {% endwith %}
+                                {% endfor %}
+                            {% endif %}
+                            
+                        </ul>
+                        <div class="h6 fw-bold">
+                            
+                            Total: 
+                            <div class="d-inline-flex">
+                                <table>
+                                    {% if not item %}
+                                        {% for key, value in cart.get_total_price.items %}
+                                            {% if value != 0 %}
+                                                <tr><th>{% if key == 'usd' %}${% elif key == 'eur' %}€{% endif %}</th><th>-</th><th>{{value}}</th></tr>
+                                                <br>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% else %}
+                                        {{ item.price }}{% if item.currency.name == 'usd' %}${% elif item.currency.name == 'eur' %}€{% endif %}
+                                    {% endif %}
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>  
+
+{% endblock %}

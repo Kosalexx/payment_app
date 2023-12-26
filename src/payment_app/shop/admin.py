@@ -2,7 +2,16 @@ from typing import Any
 
 from django.contrib import admin
 from django.utils.safestring import mark_safe
-from shop.models import Currency, Discount, Item, Order, OrderItem, Tax
+from shop.models import (
+    Category,
+    Currency,
+    Discount,
+    Exchange,
+    Item,
+    Order,
+    OrderItem,
+    Tax,
+)
 
 
 class ItemAdmin(admin.ModelAdmin):
@@ -36,8 +45,15 @@ class CurrencyAdmin(admin.ModelAdmin):
     list_per_page = 10
 
 
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ["id", "name", "description", "tax"]
+    list_display_links = ["id", "name", "tax"]
+    ordering = ["id"]
+    list_per_page = 10
+
+
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ["id", "paid", "customer_email", "tax", "discount", "created_at", "updated_at"]
+    list_display = ["id", "paid", "customer_email", "discount", "created_at", "updated_at"]
     list_display_links = ["id"]
     ordering = ["created_at"]
     fields = [
@@ -65,7 +81,7 @@ class OrderItemAdmin(admin.ModelAdmin):
 
 
 class TaxAdmin(admin.ModelAdmin):
-    list_display = ["id", "name", "value", "stripe_id"]
+    list_display = ["id", "name", "percentage"]
     list_display_links = ["id", "name"]
     ordering = ["created_at"]
     list_per_page = 10
@@ -78,9 +94,18 @@ class DiscountAdmin(admin.ModelAdmin):
     list_per_page = 10
 
 
+class ExchangeAdmin(admin.ModelAdmin):
+    list_display = ["id", "from_cur", "to_cur", "value"]
+    list_display_links = ["id", "from_cur", "to_cur"]
+    ordering = ["created_at"]
+    list_per_page = 10
+
+
 admin.site.register(Item, ItemAdmin)
 admin.site.register(Currency, CurrencyAdmin)
 admin.site.register(Order, OrderAdmin)
 admin.site.register(OrderItem, OrderItemAdmin)
 admin.site.register(Tax, TaxAdmin)
 admin.site.register(Discount, DiscountAdmin)
+admin.site.register(Exchange, ExchangeAdmin)
+admin.site.register(Category, CategoryAdmin)

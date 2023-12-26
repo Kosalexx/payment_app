@@ -1,0 +1,104 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Your order was created</h1>
+    <div class="container">
+        <div class="row justify-content-between">
+            <div class="col col-lg-12">
+                <h3>Order data:</h3>
+                <ul>
+                    <li>User email: <span class="h6 fw-bold"> {{ info.order.customer_email }}</span> </li>
+                    <li>Discount: {% if info.order.discount %} {{ info.order.discount.percent_off }} %{% else %} None {% endif %}</li>
+                    
+                </ul>
+                <div class="col-12 text-end">
+                <div class="h6 fw-bold text-end">
+                            
+                    Total info (before discounts, taxes and currency exchange): 
+                    <div id="total" class="d-inline-flex">
+                        <table class="text-end table table-bordered">
+                            <tr>
+                            {% for key, value in info.total_by_cur %}
+                                {% if value != 0 %}
+                                    <th>{% if key == 'usd' %}${% elif key == 'eur' %}€{% endif %}</th><th></th><th>{{value}}</th>
+                                    
+                                {% endif %}
+                            {% endfor %}
+                            </tr>
+                        </table>
+                    </div>
+                </div><hr>
+                <div class="h6 fw-bold">
+                            
+                    Total counted in the selected currency: 
+                    <div id="total" class="d-inline-flex">
+                        <table class="text-end table table-bordered">
+                            <tr>
+                                <th>{% if info.order.payment_currency.name == 'usd' %}${% else %}€{% endif %}</th>
+                                <th></th>
+                                <th>{{ info.total_in_order_cur }}</th>
+                            </tr>
+                            <br>
+                        </table>
+                    </div>
+                </div><hr>
+                {% if info.order.discount %}
+                <div class="h6 fw-bold">
+                            
+                    Promo code '{{ info.order.discount.name }}' successfully added! Your discount: 
+                    <div id="total" class="d-inline-flex">
+                        <table class="text-end table table-bordered">
+                            <tr>
+                                <th style="color: green;">-</th>
+                                <th style="color: green;">{{ info.order.discount.percent_off }}</th>
+                                <th style="color: green;">%</th>
+                            </tr>
+                            <br>
+                        </table>
+                    </div>
+                </div><hr>
+                {% endif %}
+                
+                <div class="h6 fw-bold">
+                    FINAL TOTAL:
+                    <div class="d-inline-flex">
+                        <table class="text-end table table-bordered">
+                            <tr><th style="color: red;">{% if info.order.payment_currency.name == 'usd' %}${% else %}€{% endif %}</th>
+                                <th style="color: red;"></th>
+                                <th style="color: red;">{% if info.total_after_discount %}{{ info.total_after_discount }}{% else %}{{ info.total_in_order_cur }}{% endif %}</th>
+                            </tr>
+                                <br>
+                        </table>
+                    </div>
+                </div><hr>
+                
+            </div>
+            <div class="container-fluid text-end">
+            <button class="btn btn-primary btn-md mt-4" id="buy-button">Pay with stripe</button>
+        </div>
+        </div>
+        </div>
+        <div>
+        
+        </div>
+        
+        <script type="text/javascript">    
+            fetch("{% url 'config' info.order.payment_currency.name %}")
+            .then((result) => { return result.json(); })
+            .then((data) => {
+                const stripe = Stripe(data.publicKey);
+                var buyButton = document.getElementById('buy-button')
+                buyButton.addEventListener("click", () => {
+                    fetch('{% url "stripe-session-buy" info.order.id %}', {method: 'GET'})
+                    .then((result) => { return result.json(); })
+                    .then((data) => {
+                        return stripe.redirectToCheckout({sessionId: data.sessionId})
+                    })
+                });
+            });
+            </script>
+    </div>
+
+{% endblock %}
+

@@ -1,13 +1,14 @@
 {% load static %}
+<div class="col-md-4 d-flex align-items-stretch">
+    <a class="link-offset-2 link-underline link-underline-opacity-0" href="{% url 'item-info' item.pk %}">
 
-<a class="link-offset-2 link-underline link-underline-opacity-0" href="{% url 'item-info' item.pk %}">
-    <div class="col">
-        <div class="card h-100">
-            <div class="border border-light p-2 mb-3" >
+
+        <div class="card border p-2 mb-3 h-100" >
+            <div class="row align-items-center border border-light p-2 mb-3" style="height: 350px">
             {% if item.photo %}
-                <img src="{{ item.photo.url }}" class="card-img-top" hight="150px" alt="{{ item.name }}">
+                <img src="{{ item.photo.url }}" class="card-img mx-auto" alt="{{ item.name }}">
             {% else %}
-                <img src="{% static 'img/no-image.png' %}" class="card-img-top"  hight="150px" alt="No image">
+                <img src="{% static 'img/no-image.png' %}" class="card-img mx-auto"  alt="No image">
 
             {% endif %}
             </div>
@@ -22,5 +23,6 @@
             <hr>
             </div>
         </div>
-    </div>
-</a>
+
+    </a>
+</div>

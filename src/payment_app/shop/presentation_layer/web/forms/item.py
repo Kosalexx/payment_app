@@ -1,3 +1,4 @@
+from decimal import Decimal
 from typing import Any
 
 from django import forms
@@ -22,7 +23,7 @@ class AddItemForm(forms.Form):
         help_text="Enter Description.",
     )
     price = forms.DecimalField(
-        min_value=0,
+        min_value=Decimal(0.50),
         max_digits=9,
         decimal_places=2,
         label="Price",
@@ -30,6 +31,7 @@ class AddItemForm(forms.Form):
         required=True,
     )
     currency = forms.ChoiceField(label="Currency", required=True, widget=forms.Select(attrs={"class": "form-control"}))
+    category = forms.ChoiceField(label="Category", required=True, widget=forms.Select(attrs={"class": "form-control"}))
     photo = forms.ImageField(
         label="Photo",
         allow_empty_file=False,
@@ -41,6 +43,9 @@ class AddItemForm(forms.Form):
         widget=forms.FileInput(attrs={"class": "form-control"}),
     )
 
-    def __init__(self, currencies: list[tuple[str, str]], *args: Any, **kwargs: Any) -> None:
+    def __init__(
+        self, currencies: list[tuple[str, str]], categories: list[tuple[str, str]], *args: Any, **kwargs: Any
+    ) -> None:
         super(AddItemForm, self).__init__(*args, **kwargs)
         self.fields["currency"].choices = currencies
+        self.fields["category"].choices = categories

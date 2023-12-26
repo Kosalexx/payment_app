@@ -10,7 +10,7 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db import IntegrityError
 from PIL import Image
 from shop.business_logic.errors import ItemAlreadyExistsError, ItemNotFoundError
-from shop.models import Currency, Item
+from shop.models import Category, Currency, Item
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
@@ -72,8 +72,9 @@ def create_product(data: AddItemDTO) -> str:
 
     try:
         currency = Currency.objects.get(name=data.currency)
+        category = Category.objects.get(name=data.category)
         created_item = Item.objects.create(
-            name=data.name, price=data.price, description=data.description, currency=currency
+            name=data.name, price=data.price, description=data.description, currency=currency, category=category
         )
         if data.photo is not None:
             file = replace_file_name_to_uuid(data.photo)

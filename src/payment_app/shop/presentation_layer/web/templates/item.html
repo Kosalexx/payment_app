@@ -33,22 +33,7 @@
                 <div class="col-lg-6">Description:<ul>      {{ item.description }}</ul></div>
             </div>
             <div class="col-lg-3">
-                <button class="btn w-75 btn-primary " id="buy-button">Buy now</button>
-                <script type="text/javascript">
-                    fetch("{% url 'config' item.currency.name %}")
-                    .then((result) => { return result.json(); })
-                    .then((data) => {
-                        const stripe = Stripe(data.publicKey);
-                        var buyButton = document.getElementById('buy-button')
-                        buyButton.addEventListener("click", () => {
-                            fetch('{% url "stripe-session-buy" item.id %}', {method: 'GET'})
-                            .then((result) => { return result.json(); })
-                            .then((data) => {
-                                return stripe.redirectToCheckout({sessionId: data.sessionId})
-                        })
-                    });
-                });
-                </script>
+                <a href="{% url 'item-order' item.id %}" class="btn w-75 btn-primary">Buy now</a>
                 <button type="button" id="add-button" value="{{ item.id }}"class="btn w-75 btn-secondary">
                 Add to cart
                 </button>

@@ -4,3 +4,7 @@ class ItemAlreadyExistsError(Exception):
 
 class ItemNotFoundError(Exception):
     """Raises when Item wasn't found in the database."""
+
+
+class DiscountNotFoundError(Exception):
+    """Raises when Discount wasn't found in the database."""

@@ -4,6 +4,7 @@
     <h1 class="h5">Shopping cart</h1>
 
     <hr />
+    {% if cart %}
     {% for item in cart %}
       {% with product=item.product %}
       <br />
@@ -58,30 +59,34 @@
         </div>
       </div>
       {% endwith %}
-    {% endfor %}
-    
-    <div class="col-12 text-end">
-      <div class="h6 fw-bold">
-        Total: 
-        <div id="total" class="d-inline-flex">
-          <table>
-          {% for key, value in cart.get_total_price.items %}
-            {% if value != 0 %}
-              <tr><th>{% if key == 'usd' %}${% elif key == 'eur' %}€{% endif %}</th><th>-</th><th>{{value}}</th></tr>
-              <br>
-            {% endif %}
-            
-          
-          {% endfor %}
-          </table>
+      {% endfor %}
+
+      <div class="col-12 text-end">
+        <div class="h6 fw-bold">
+          Total: 
+          <div id="total" class="d-inline-flex">
+            <table>
+            {% for key, value in cart.get_total_price.items %}
+              {% if value != 0 %}
+                <tr><th>{% if key == 'usd' %}${% elif key == 'eur' %}€{% endif %}</th><th>-</th><th>{{value}}</th></tr>
+                <br>
+              {% endif %}
+              
+            {% endfor %}
+            </table>
+          </div>
         </div>
-      </div>
-      <button type="button" class="btn btn-warning btn-md  mt-4">
-        <a class="nav-link text-decoration-none" href="{% url 'clear-cart' %}">Clear cart</a>
-      </button>
-        <button type="button" class="btn btn-success btn-md text-bg-light mt-4">
-          <a class="nav-link text-decoration-none" href="">Create order</a>
+        <button type="button" class="btn btn-warning btn-md  mt-4">
+          <a class="nav-link text-decoration-none" href="{% url 'clear-cart' %}">Clear cart</a>
         </button>
+          <button type="button" class="btn btn-success btn-md text-bg-light mt-4">
+            <a class="nav-link text-decoration-none" href="{% url 'order-create' %}">Create order</a>
+          </button>
+    {% else %}
+    No items in cart!
+    {% endif %}
+    
+    
     </div>
   </div>
 

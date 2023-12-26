@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container">
+<div class="card-group row row-cols-1 row-cols-md-3 g-4">
+    {% if discounts %}
+    <table class="table table-bordered">
+        <h1>Discounts</h1>
+        <caption>Available Discounts</caption>
+        <tr>
+            <th>Promo code</th>
+            <th>Discount percent, %</th>
+            <th>Description</th>
+        </tr>
+            {% for discount in discounts %}
+            <tr>  
+            <td>{{ discount.name }}</td>
+            <td>{{ discount.percent_off }}</td>
+            <td>{{ discount.description }}</td>
+            </tr>
+            {% endfor %}
+        
+    </table>
+    {% else %}
+    <h2>There aren't any discounts.</h2>
+    {% endif %}
+</div>
+</div>
+
+{% endblock %}
