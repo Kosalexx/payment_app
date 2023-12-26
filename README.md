@@ -22,8 +22,10 @@ A simple online store with connected Stripe API payment system.
  - [x] - Модель Order, в которой можно объединить несколько Item и сделать платёж в Stripe на содержимое Order c общей стоимостью всех Items
  - [x] - Модели Discount, Tax, которые можно прикрепить к модели Order и связать с соответствующими атрибутами при создании платежа в Stripe - в таком случае они корректно отображаются в Stripe Checkout форме. ---  # для привязки скидки к заказу используются промокоды. Пользователь вводит промокод, если такой есть в БД -> заказ получает скидку. / Налоги прикреплены к категории товара, в зависимости от категории назначается налог, также к каждому заказу при создании добавляется "налог платежной системы" (далее можно придумать другую логику для добавления налогов). 
  - [x]	Добавить поле Item.currency, создать 2 Stripe Keypair на две разные валюты и в зависимости от валюты выбранного товара предлагать оплату в соответствующей валюте. --- # Создано 2 компании в рамках аккаунта и в зависимости от валюты выбирается оплата на нужный аккаунт. Также при оплате пользователь выбирает в какой валюте платить - исходя из этого добавлена модель Exchange - для конвертации валюты в случаях если в корзину добавлены товары в разных валютах.
- - [ ]	Реализовать не Stripe Session, а Stripe Payment Intent. 
- # TODO 1. Stripe webhooks
+ - [x]	Реализовать не Stripe Session, а Stripe Payment Intent. --- после подтверждения заказа пользователю предлагается оплатить или через Stripe Session, или Stripe Payment Intent.
+ ###### # TODO 1. Stripe webhooks
+ ###### # TODO 2. Github actions
+
 
 </details>
 
@@ -95,8 +97,7 @@ Taxes are attached to the product category, depending on the category the tax is
 Stripe Session API is used as a payment acceptance system.
 
 
- # TODO 1. PaymentIntent
- # TODO 2. Stripe webhooks
+ ###### # TODO 1. Stripe webhooks
 
 <h1></h1>
 
@@ -149,10 +150,24 @@ The project will run locally at `http://127.0.0.1:8000/`
 <details><summary>Local launch: Docker Compose/PostgreSQL</summary>
 
 2. From the root directory of the project, execute the command:
+
 ```bash
 docker-compose -f docker-compose.yml up -d --build
 ```
+
+!On the first run, the application container may not go up right away because the database container is not yet ready for use. In this case, repeat the command:
+
+```bash
+docker-compose -f docker-compose.yml up -d --build
+```
+
 The project will be hosted in two docker containers (db, app) at `http://localhost:8000/`.
+
+To create super user run comand
+
+```bash
+docker exec payment_app-app-1 python ./src/payment_app/manage.py createsuperuser --noinput
+```
 
 3. You can stop docker and delete containers with the command from the root directory of the project:
 ```bash

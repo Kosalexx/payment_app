@@ -12,6 +12,7 @@ if TYPE_CHECKING:
     from django.http import HttpRequest
     from shop.business_logic.dto import OrderDataDTO
     from shop.models import Tax
+    from stripe import PaymentIntent
     from stripe.checkout import Session
 
 
@@ -96,7 +97,29 @@ def create_checkout_session(request: HttpRequest, data: OrderDataDTO) -> Session
             tax_id_collection={"enabled": True},
             success_url=request.build_absolute_uri(reverse("success")),
             cancel_url=request.build_absolute_uri(reverse("failed")),
+            metadata={"order_id": data.order.pk},
         )
         return checkout_session
+    except Exception as e:
+        raise Exception from e
+
+
+def create_payment_intent(data: OrderDataDTO) -> PaymentIntent:
+    """Creates Stripe payment intent."""
+
+    try:
+        keys: dict = get_stripe_settings_by_currency_name(data.order.payment_currency.name)
+        stripe.api_key = keys["secretKey"]
+        customer = stripe.Customer.create(email=data.order.customer_email)
+        order_id = data.order.pk
+        price = Decimal(data.final_total) * (100)
+        intent = stripe.PaymentIntent.create(
+            amount=Decimal(price).quantize(Decimal("1")),
+            currency=data.order.payment_currency.name,
+            payment_method_types=["card"],
+            customer=customer["id"],
+            metadata={"product_id": order_id},
+        )
+        return intent
     except Exception as e:
         raise Exception from e

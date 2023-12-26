@@ -15,7 +15,7 @@ class Tax(BaseModel):
     name = models.CharField(max_length=30, unique=True)
 
     def __str__(self) -> str:
-        return f"{(self.name)}: {self.percentage}%"
+        return f"{(self.name).replace('_', ' ').capitalize()}: {self.percentage}%"
 
     class Meta:
         """Describes class metadata."""
