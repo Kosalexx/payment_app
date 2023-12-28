@@ -85,7 +85,7 @@ def create_product(data: AddItemDTO) -> str:
     except IntegrityError:
         logger.info(
             msg="Product with passed name already exist.",
-            extra={"name": data.name},
+            extra={"product_name": data.name},
         )
         raise ItemAlreadyExistsError
     return pk
